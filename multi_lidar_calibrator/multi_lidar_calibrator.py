@@ -120,7 +120,7 @@ class MultiLidarCalibrator(Node):
                         Lidar(
                             lidar,
                             Translation(*self.get_parameter(lidar).value[0:3]),
-                            Rotation(*self.get_parameter(lidar).value[3:], True),
+                            Rotation(*self.get_parameter(lidar).value[3:], self.table_degrees),
                         )
                         for lidar in lidar_list
                     ],
@@ -141,7 +141,7 @@ class MultiLidarCalibrator(Node):
 
     def log_calibration_info(self, calibration: Calibration):
         """Log calibration information in ROS and output file"""
-        calibration_info = f"calibration info:\n{calibration.info(True, True)}"
+        calibration_info = f"calibration info:\n{calibration.info(False, True)}"
         self.get_logger().info(calibration_info)
         with open(self.output_dir + self.results_file, "a") as file:
             file.write(calibration_info + "\n")
@@ -215,6 +215,7 @@ class MultiLidarCalibrator(Node):
                 self.ransac_n,
                 self.num_iterations,
                 self.crop_cloud,
+                self.get_logger(),
             )
             calibration.compute_gicp_transformation(self.voxel_size, self.remove_ground_flag)
             # Check the fitness score of the calibration
@@ -260,6 +261,7 @@ class MultiLidarCalibrator(Node):
                     self.ransac_n,
                     self.num_iterations,
                     self.crop_cloud,
+                    self.get_logger(),
                 )
                 calibration.compute_gicp_transformation(self.voxel_size, self.remove_ground_flag)
                 if calibration.reg_p2l.fitness <= self.fitness_score_threshold:
@@ -314,6 +316,7 @@ class MultiLidarCalibrator(Node):
                         self.ransac_n,
                         self.num_iterations,
                         self.crop_cloud,
+                        self.get_logger(),
                     )
                     calibration.compute_gicp_transformation(
                         self.voxel_size, self.remove_ground_flag
@@ -390,7 +393,10 @@ class MultiLidarCalibrator(Node):
         """
         self.get_logger().info("Starting the calibration...")
         if self.visualize:
-            visualize_calibration(list(self.lidar_dict.values()), False)
+            self.get_logger().info("Visualizing the initial point clouds")
+            #visualize_calibration(list(self.lidar_dict.values()), visualize_original=True, visualize_input_transformation=False, visualize_transformed=False)
+            self.get_logger().info("Visualizing the input transformations")
+            visualize_calibration(list(self.lidar_dict.values()), visualize_original=False, visualize_input_transformation=True, visualize_transformed=False)
         target_lidar = self.lidar_dict[self.target_lidar]
         if self.calibrate_to_base and self.calibrate_target:
             # Perform target to ground (base) calibration. This computes the z-distance between the ground and the target
@@ -407,6 +413,7 @@ class MultiLidarCalibrator(Node):
 
             # Update the target lidar's rotation
             target_lidar.rotation.y = pitch
+            target_lidar.rotation.x = roll
             rotation = target_lidar.rotation
 
             # Create a horizontal point cloud to use as a ground reference
@@ -424,6 +431,7 @@ class MultiLidarCalibrator(Node):
                 self.rel_rmse,
                 self.max_iterations,
                 self.crop_cloud,
+                self.get_logger(),
             )
             translation = target_lidar.translation
             calibration.compute_gicp_transformation(self.voxel_size, remove_ground_plane=False)
@@ -468,7 +476,8 @@ class MultiLidarCalibrator(Node):
         else:
             self.standard_calibration(target_lidar)
 
-        visualize_calibration(list(self.lidar_dict.values()), True, not self.visualize)
+        if self.visualize:
+            visualize_calibration(list(self.lidar_dict.values()), visualize_original=False, visualize_input_transformation=True, visualize_transformed=False)
         # Stitch point clouds
         stitched_pcd = o3d.geometry.PointCloud()
         for lidar in self.lidar_dict.values():

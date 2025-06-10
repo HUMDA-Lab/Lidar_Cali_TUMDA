@@ -11,7 +11,7 @@ from .Lidar import Lidar
 from scipy.spatial.transform import Rotation as R
 
 
-def visualize_calibration(lidar_list: list[Lidar], transformed=True, only_paint=False):
+def visualize_calibration(lidar_list: list[Lidar], visualize_original=False, visualize_input_transformation=False, visualize_transformed=False):
     """
     Visualize the calibration of a list of LiDAR sensors.
 
@@ -35,13 +35,6 @@ def visualize_calibration(lidar_list: list[Lidar], transformed=True, only_paint=
         [0.8, 0.4, 0.2],
         [0.8, 0.6, 0.6],
     ]
-    for lidar, color in zip(lidar_list, colors):
-        if transformed:
-            lidar.pcd_transformed.paint_uniform_color(color)
-        else:
-            lidar.pcd.paint_uniform_color(color)
-    if only_paint:
-        return
 
     vis = o3d.visualization.Visualizer()
     vis.create_window(visible=True)
@@ -49,12 +42,20 @@ def visualize_calibration(lidar_list: list[Lidar], transformed=True, only_paint=
     vis.get_render_option().background_color = [0, 0, 0]
     vis.get_render_option().point_size = 2
 
-    if transformed:
-        for lidar in lidar_list:
-            vis.add_geometry(lidar.pcd_transformed)
-    else:
-        for lidar in lidar_list:
-            vis.add_geometry(lidar.pcd)
+    for lidar, color in zip(lidar_list, colors):
+        if visualize_original:
+            pcd_copy = o3d.geometry.PointCloud(lidar.pcd)
+            pcd_copy.paint_uniform_color(color)
+            vis.add_geometry(pcd_copy)
+        if visualize_input_transformation:
+            pcd_copy = o3d.geometry.PointCloud(lidar.pcd)
+            pcd_copy.transform(lidar.tf_matrix.matrix)
+            pcd_copy.paint_uniform_color(color)
+            vis.add_geometry(pcd_copy)
+        if visualize_transformed:
+            pcd_copy = o3d.geometry.PointCloud(lidar.pcd_transformed)
+            pcd_copy.paint_uniform_color(color)
+            vis.add_geometry(pcd_copy)
 
     vis.run()
 
@@ -105,6 +106,7 @@ class Calibration:
         ransac_n=3,
         num_iterations=1000,
         crop_cloud=20,
+        logger=None
     ):
         """
         Initialize a Calibration object.
@@ -132,11 +134,13 @@ class Calibration:
         self.ransac_n = ransac_n
         self.num_iterations = num_iterations
         self.crop_cloud = crop_cloud
-        self.initial_transformation = self.compute_initial_transformation()
+        self.logger = logger
+        self.initial_transformation = self.compute_initial_transformation(False)
+        #self.initial_transformation = self.source.tf_matrix
         self.calibrated_transformation = None
         self.reg_p2l = None
 
-    def compute_initial_transformation(self) -> TransformationMatrix:
+    def compute_initial_transformation(self, use_teaser=True) -> TransformationMatrix:
         """
         Compute the initial transformation matrix between the source and target lidars.
 
@@ -150,42 +154,76 @@ class Calibration:
         )
         self.initial_transformation = TransformationMatrix.from_matrix(transformation_matrix)
 
-        if self.source.pcd is None:
-            raise Exception("no source point cloud")
-        if self.target.pcd is None:
-            raise Exception("no target point cloud")
+        #print initial transformation
+        #self.logger.info("Initial transformation from table between " + self.source.name + " and " + self.target.name + ":")
+        #self.logger.info(f"Translation: {self.initial_transformation.translation}")
+        #self.logger.info(f"Rotation (rad): {self.initial_transformation.rotation}")
 
-        # Create copies of the source and target point clouds
-        source_pcd = o3d.geometry.PointCloud(self.source.pcd.transform(transformation_matrix))
-        target_pcd = o3d.geometry.PointCloud(self.target.pcd)
+        if use_teaser:
+            if self.source.pcd is None:
+                raise Exception("no source point cloud")
+            if self.target.pcd is None:
+                raise Exception("no target point cloud")
 
-        method = 'TEASER'
-        if method == 'FPFH':
-            fpfh_voxel_size = 0.5
-            source_fpfh = self.preprocess_point_cloud(source_pcd, fpfh_voxel_size)
-            target_fpfh = self.preprocess_point_cloud(target_pcd, fpfh_voxel_size)
-            distance_threshold = fpfh_voxel_size * 10
-            reg_fpfh = o3d.pipelines.registration.registration_fgr_based_on_feature_matching(
-                source_pcd, target_pcd, source_fpfh, target_fpfh,
-                o3d.pipelines.registration.FastGlobalRegistrationOption(
-                    use_absolute_scale=True,
-                    maximum_correspondence_distance=distance_threshold))
-            print("FPFH Trafo:")
-            print(reg_fpfh.transformation)
-            self.initial_transformation = TransformationMatrix.from_matrix(reg_fpfh.transformation)
+            # Create copies of the source and target point clouds
+            source_pcd = o3d.geometry.PointCloud(self.source.pcd)
+            source_pcd.transform(self.initial_transformation.matrix)
+            target_pcd = o3d.geometry.PointCloud(self.target.pcd)
+
+            method = 'TEASER'
+            if method == 'FPFH':
+                fpfh_voxel_size = 0.5
+                source_fpfh = self.preprocess_point_cloud(source_pcd, fpfh_voxel_size)
+                target_fpfh = self.preprocess_point_cloud(target_pcd, fpfh_voxel_size)
+                distance_threshold = fpfh_voxel_size * 10
+                reg_fpfh = o3d.pipelines.registration.registration_fgr_based_on_feature_matching(
+                    source_pcd, target_pcd, source_fpfh, target_fpfh,
+                    o3d.pipelines.registration.FastGlobalRegistrationOption(
+                        use_absolute_scale=True,
+                        maximum_correspondence_distance=distance_threshold))
+                print("FPFH Trafo:")
+                print(reg_fpfh.transformation)
+                combined_matrix = reg_fpfh.transformation @ transformation_matrix
+                self.initial_transformation = TransformationMatrix.from_matrix(combined_matrix)
+    
         
-        elif method == 'RANSAC':
-            voxel_size = 0.35
-            num_iterations = 20
-            distance_threshold = voxel_size * 20
-            transformations = [self.run_ransac_registration(source_pcd, target_pcd, voxel_size, distance_threshold) for _ in range(num_iterations)]
-            median_trans = self.median_transformation(transformations)
-            self.initial_transformation = TransformationMatrix.from_matrix(median_trans)
+            elif method == 'RANSAC':
+                voxel_size = 0.35
+                num_iterations = 20
+                distance_threshold = voxel_size * 20
+                transformations = [self.run_ransac_registration(source_pcd, target_pcd, voxel_size, distance_threshold) for _ in range(num_iterations)]
+                ransac_transformation = self.median_transformation(transformations)
+                combined_matrix = ransac_transformation @ transformation_matrix
+                self.initial_transformation = TransformationMatrix.from_matrix(combined_matrix)
 
-        elif method == 'TEASER':
-            voxel_size = 0.35
-            teaser_transformation = self.teaser_initial_registration(source_pcd, target_pcd, voxel_size)
-            self.initial_transformation = TransformationMatrix.from_matrix(teaser_transformation)
+            elif method == 'TEASER':
+                self.logger.info("Using TEASER for initial registration")
+                voxel_size = 0.1
+                teaser_transformation = self.teaser_initial_registration(source_pcd, target_pcd, voxel_size)
+                combined_matrix = teaser_transformation @ transformation_matrix
+                self.initial_transformation = TransformationMatrix.from_matrix(combined_matrix)
+
+
+            vis = o3d.visualization.Visualizer()
+            vis.create_window(visible=True)
+            # Change the background color to black
+            vis.get_render_option().background_color = [0, 0, 0]
+            vis.get_render_option().point_size = 2
+
+            pcd_copy = o3d.geometry.PointCloud(self.source.pcd)
+            pcd_copy.transform(self.initial_transformation.matrix)
+            pcd_copy.paint_uniform_color([0, 0.4, 0.74])
+            vis.add_geometry(pcd_copy)
+
+            target_pcd_copy = o3d.geometry.PointCloud(target_pcd)
+            target_pcd_copy.paint_uniform_color([1, 1, 1])
+            vis.add_geometry(target_pcd_copy)
+            # self.logger.info("Initial transformation between " + self.source.name + " and " + self.target.name + ":")
+            vis.run()
+            self.logger.info("Initial transformation from TEASER between " + self.source.name + " and " + self.target.name + ":")
+            self.logger.info(f"Translation: {self.initial_transformation.translation}")
+            self.logger.info(f"Rotation (rad): {self.initial_transformation.rotation}")
+
         return self.initial_transformation
     
     def teaser_initial_registration(self, source_pcd, target_pcd, voxel_size):
@@ -363,42 +401,40 @@ class Calibration:
             self.source.pcd_transformed.transform(transformation_matrix)
             self.source.calib_tf_matrix = TransformationMatrix.from_matrix(transformation_matrix)
 
-    def info(self, degrees=False, matrix=False):
+    def info(self, degrees=False, matrix=False, show_initial=True):
         """
         Generate a string containing information about the calibration.
 
         Args:
             degrees: If True, the rotation angles are converted to degrees. If False, they are left in radians.
             matrix: If True, prints the transformation matrix.
+            show_initial: If True, includes the initial transformation information.
         Returns:
             A string containing information about the calibration.
         """
+        s = ""
+        
+        # Add initial transformation info if requested
+        if show_initial:
+            s += "INITIAL TRANSFORMATION:\n"
+            s += "initial xyz = " + self.initial_transformation.translation.__str__() + "\n"
+            s += "initial rpy = " + self.initial_transformation.rotation.__str__(degrees) + "\n"
+            if matrix:
+                s += "initial transformation matrix:\n" + str(self.initial_transformation.matrix) + "\n"
+            s += "\n"
+        
+        # Add calibrated transformation info
+        s += "CALIBRATED TRANSFORMATION:\n"
+        s += "calibrated xyz = " + self.calibrated_transformation.translation.__str__() + "\n"
+        s += "calibrated rpy = " + self.calibrated_transformation.rotation.__str__(degrees) + "\n"
+        
         if matrix:
-            s = (
-                "calibrated transformation matrix:\n"
-                + str(self.calibrated_transformation.matrix)
-                + "\n"
-            )
-        else:
-            s = ""
+            s += "calibrated transformation matrix:\n" + str(self.calibrated_transformation.matrix) + "\n"
+        
+        s += "fitness: " + str(self.reg_p2l.fitness) + ", inlier_rmse: " + str(self.reg_p2l.inlier_rmse) + "\n"
+        
         return (
-            self.source.name
-            + " to "
-            + self.target.name
-            + " calibration\n"
-            + "calibrated xyz = "
-            + self.calibrated_transformation.translation.__str__()
-            + "\n"
-            + "calibrated rpy = "
-            + self.calibrated_transformation.rotation.__str__(degrees)
-            + "\n"
-            + "fitness: "
-            + str(self.reg_p2l.fitness)
-            + ", inlier_rmse: "
-            + str(self.reg_p2l.inlier_rmse)
-            + "\n"
-            + s
-            + "_" * 100
+            self.source.name + " to " + self.target.name + " calibration\n" + s + "_" * 100
         )
 
     def preprocess_point_cloud(self, pcd, voxel_size):

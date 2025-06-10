@@ -1,0 +1,39 @@
+/**:
+  ros__parameters:
+    visualize: true
+    use_fitness_based_calibration: false
+    # Topics for all lidars
+    lidar_topics: [ouster, front, right, left]
+    table_degrees: false
+    read_tf_from_table: true
+
+    # table of lidar name (frame_id in ROS), xyz translation [m], rpy rotation [deg/rad]
+    ouster: [4.446, 0.02, 1.32, -0.028, 0.038, -0.014]
+    front: [2.308, 0.0, 0.70375, -0.0, -1.5707963267948966, -3.14159]
+    right: [1.70, -0.19, 0.77475, 0.6, -1.545, 0.4471953]
+    left: [1.64, 0.19, 0.77475, -1.3, -1.54, 0.256]
+
+    # egyszer mar mukodott setup:
+    # OUSTER FRAME:
+    # ouster: [0.0, 0.0, -0.35, 0.05, -0.011, -0.020]
+    # front: [-2.13178446, -0.028217539, -1.065434, -1.02060464, -1.4818257, -2.1205372]
+
+    # VEHICLE FRAME:
+    # ouster: [4.438, 0.0, 1.27, -0.019, 0.016, -0.01]
+    # front: [2.308, 0.0, 0.70375, -0.14336, -1.5501101979999987, -2.994086805]
+
+
+    target_frame_id: ouster
+    base_frame_id: vehicle
+    calibrate_to_base: true
+    calibrate_target: true
+
+    # path for point clouds in pcd format. Structure: /pcd_directory/<lidar_name>.pcd
+    pcd_directory: /../data/LC03/
+
+    # logging output
+    results_file: LC03_results.txt
+    remove_ground_flag: false
+
+    # calibration results are stored here (path relative to the dir with multi_lidar_calibrator.py)
+    output_dir: /../output/
