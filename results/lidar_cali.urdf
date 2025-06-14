@@ -1,270 +1,270 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version='1.0' encoding='us-ascii'?>
 <robot name="a2rl_vehicle">
   <link name="vehicle">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
     <visual>
-      <origin xyz="0 0.0 0.0" rpy="-1.57079632679 0.0 0.0"/>
+      <origin xyz="0 0.0 0.0" rpy="-1.57079632679 0.0 0.0" />
       <geometry>
-          <mesh filename="/home/martin_nadas/tooling/foxglove/Dallara_SF23_A2RL_Car_Subdivision1.stl" scale="1.0 1.0 1.0"/>
+          <mesh filename="/home/martin_nadas/tooling/foxglove/Dallara_SF23_A2RL_Car_Subdivision1.stl" scale="1.0 1.0 1.0" />
       </geometry>
     </visual>
     <!-- Bounding box for car size -->
     <collision>
-      <origin xyz="1.72 0 0.6" rpy="0 0 0"/>
+      <origin xyz="1.72 0 0.6" rpy="0 0 0" />
       <geometry>
-        <box size="5.2359 1.9207 1.2"/>
+        <box size="5.2359 1.9207 1.2" />
       </geometry>
     </collision>
   </link>
   <link name="gps_front">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
   </link>
   <link name="gps_rear">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
   </link>
   <link name="vectornav">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
   </link>
   <link name="kistler">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
   </link>
   <link name="radar_front">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
   </link>
   <link name="radar_left">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
   </link>
   <link name="radar_right">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
   </link>
   <link name="radar_back">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
   </link>
   <link name="lidar_front">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
   </link>
   <link name="os_lidar">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
   </link>
   <link name="lidar_left">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
   </link>
   <link name="lidar_right">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
   </link>
   <link name="camera_front_left">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
   </link>
   <link name="camera_front_right">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
   </link>
   <link name="camera_lateral_left">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
   </link>
   <link name="camera_lateral_right">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
   </link>
   <link name="camera_rear_left">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
   </link>
   <link name="camera_rear_right">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
   </link>
   <link name="camera_back">
     <inertial>
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0" />
+      <mass value="1.0" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
   </link>
   <joint name="gps_front" type="fixed">
-    <parent link="vehicle"/>
-    <child link="gps_front"/>
-    <axis xyz="1. 0. 0."/>
-    <origin xyz="3.247 0.0 0.6115" rpy="0.0 0.0 0.0"/>
+    <parent link="vehicle" />
+    <child link="gps_front" />
+    <axis xyz="1. 0. 0." />
+    <origin xyz="3.247 0.0 0.6115" rpy="0.0 0.0 0.0" />
   </joint>
   <joint name="gps_rear" type="fixed">
-    <parent link="vehicle"/>
-    <child link="gps_rear"/>
-    <axis xyz="1. 0. 0."/>
-    <origin xyz="1.23 0.0 1.11875" rpy="0.0 0.0 0.0"/>
+    <parent link="vehicle" />
+    <child link="gps_rear" />
+    <axis xyz="1. 0. 0." />
+    <origin xyz="1.23 0.0 1.11875" rpy="0.0 0.0 0.0" />
   </joint>
   <joint name="vectornav" type="fixed">
-    <parent link="vehicle"/>
-    <child link="vectornav"/>
-    <axis xyz="1. 0. 0."/>
-    <origin xyz="-1.438 0.0 0.056" rpy="0.0 0.0 0.0"/>
+    <parent link="vehicle" />
+    <child link="vectornav" />
+    <axis xyz="1. 0. 0." />
+    <origin xyz="-1.438 0.0 0.056" rpy="0.0 0.0 0.0" />
   </joint>
   <joint name="kistler" type="fixed">
-    <parent link="vehicle"/>
-    <child link="kistler"/>
-    <axis xyz="1. 0. 0."/>
-    <origin xyz="0.049 0.0 0.189" rpy="0.0 0.0 0.0"/>
+    <parent link="vehicle" />
+    <child link="kistler" />
+    <axis xyz="1. 0. 0." />
+    <origin xyz="0.049 0.0 0.189" rpy="0.0 0.0 0.0" />
   </joint>
   <joint name="radar_front" type="fixed">
-    <parent link="vehicle"/>
-    <child link="radar_front"/>
-    <axis xyz="1. 0. 0."/>
-    <origin xyz="2.046 0.0 0.81375" rpy="-0.024852361 -0.00237147 -1.566284193"/>
+    <parent link="vehicle" />
+    <child link="radar_front" />
+    <axis xyz="1. 0. 0." />
+    <origin xyz="2.046 0.0 0.81375" rpy="-0.024852361 -0.00237147 -1.566284193" />
   </joint>
   <joint name="radar_left" type="fixed">
-    <parent link="vehicle"/>
-    <child link="radar_left"/>
-    <axis xyz="1. 0. 0."/>
-    <origin xyz="1.932 0.234 0.73775" rpy="0.003451941 -0.003284233 -0.004397056"/>
+    <parent link="vehicle" />
+    <child link="radar_left" />
+    <axis xyz="1. 0. 0." />
+    <origin xyz="1.932 0.234 0.73775" rpy="0.003451941 -0.003284233 -0.004397056" />
   </joint>
   <joint name="radar_right" type="fixed">
-    <parent link="vehicle"/>
-    <child link="radar_right"/>
-    <axis xyz="1. 0. 0."/>
-    <origin xyz="1.932 -0.234 0.73775" rpy="0.0029251870000000005 -0.000304138 -3.13771935"/>
+    <parent link="vehicle" />
+    <child link="radar_right" />
+    <axis xyz="1. 0. 0." />
+    <origin xyz="1.932 -0.234 0.73775" rpy="0.0029251870000000005 -0.000304138 -3.13771935" />
   </joint>
   <joint name="radar_back" type="fixed">
-    <parent link="vehicle"/>
-    <child link="radar_back"/>
-    <axis xyz="1. 0. 0."/>
-    <origin xyz="-0.93 0.0 0.351" rpy="-0.012066689 -0.007831702 1.57952005"/>
+    <parent link="vehicle" />
+    <child link="radar_back" />
+    <axis xyz="1. 0. 0." />
+    <origin xyz="-0.93 0.0 0.351" rpy="-0.012066689 -0.007831702 1.57952005" />
   </joint>
   <joint name="os_lidar" type="fixed">
-    <parent link="vehicle"/>
-    <child link="os_lidar"/>
-    <axis xyz="1. 0. 0."/>
-    <origin xyz="4.446 0.02 1.347" rpy="-0.018569 0.01447 -0.014"/>
+    <parent link="vehicle" />
+    <child link="os_lidar" />
+    <axis xyz="1. 0. 0." />
+    <origin xyz="4.529968444196393 0.02926975868023582 1.2734364056565288" rpy="-0.012537884392003169 0.0446295144171891 -0.016890939383730708" />
   </joint>
   <joint name="lidar_front" type="fixed">
-    <parent link="vehicle"/>
-    <child link="lidar_front"/>
-    <axis xyz="1. 0. 0."/>
-    <origin xyz="2.319 0.00268 0.68636" rpy="-0.37546573 -1.5461567 -2.7650"/>
+    <parent link="vehicle" />
+    <child link="lidar_front" />
+    <axis xyz="1. 0. 0." />
+    <origin xyz="2.3380647651400577 -0.004089855490104472 0.677756668759084" rpy="-1.9782950124124146 -1.5543739169082464 -1.1623295145423838" />
   </joint>
   <joint name="lidar_left" type="fixed">
-    <parent link="vehicle"/>
-    <child link="lidar_left"/>
-    <axis xyz="1. 0. 0."/>
-    <origin xyz="1.76349 0.12679 0.7449607" rpy="-1.7899759 -1.5592 0.7437"/>
+    <parent link="vehicle" />
+    <child link="lidar_left" />
+    <axis xyz="1. 0. 0." />
+    <origin xyz="1.76349 0.12679 0.7449607" rpy="-1.7899759 -1.5592 0.7437" />
   </joint>
   <joint name="lidar_right" type="fixed">
-    <parent link="vehicle"/>
-    <child link="lidar_right"/>
-    <axis xyz="1. 0. 0."/>
-    <origin xyz="1.7286966 -0.11475 0.76980" rpy="2.916668 -1.564541 -1.86865887"/>
+    <parent link="vehicle" />
+    <child link="lidar_right" />
+    <axis xyz="1. 0. 0." />
+    <origin xyz="1.7286966 -0.11475 0.76980" rpy="2.916668 -1.564541 -1.86865887" />
   </joint>
   <joint name="camera_front_left" type="fixed">
-    <parent link="vehicle"/>
-    <child link="camera_front_left"/>
-    <axis xyz="1. 0. 0."/>
-    <origin xyz="2.303 0.16 0.70175" rpy="-1.581995607 0.005992754 -1.615275083"/>
+    <parent link="vehicle" />
+    <child link="camera_front_left" />
+    <axis xyz="1. 0. 0." />
+    <origin xyz="2.303 0.16 0.70175" rpy="-1.581995607 0.005992754 -1.615275083" />
   </joint>
   <joint name="camera_front_right" type="fixed">
-    <parent link="vehicle"/>
-    <child link="camera_front_right"/>
-    <axis xyz="1. 0. 0."/>
-    <origin xyz="2.303 -0.16 0.70175" rpy="-1.625139314 0.002817 -1.512096583"/>
+    <parent link="vehicle" />
+    <child link="camera_front_right" />
+    <axis xyz="1. 0. 0." />
+    <origin xyz="2.303 -0.16 0.70175" rpy="-1.625139314 0.002817 -1.512096583" />
   </joint>
   <joint name="camera_lateral_left" type="fixed">
-    <parent link="vehicle"/>
-    <child link="camera_lateral_left"/>
-    <axis xyz="1. 0. 0."/>
-    <origin xyz="-1.284 0.245 0.665" rpy="-1.52825171 0.00637213 -0.517369466"/>
+    <parent link="vehicle" />
+    <child link="camera_lateral_left" />
+    <axis xyz="1. 0. 0." />
+    <origin xyz="-1.284 0.245 0.665" rpy="-1.52825171 0.00637213 -0.517369466" />
   </joint>
   <joint name="camera_lateral_right" type="fixed">
-    <parent link="vehicle"/>
-    <child link="camera_lateral_right"/>
-    <axis xyz="1. 0. 0."/>
-    <origin xyz="-1.284 -0.245 0.665" rpy="-1.552155143 -0.014505592 -2.630802879"/>
+    <parent link="vehicle" />
+    <child link="camera_lateral_right" />
+    <axis xyz="1. 0. 0." />
+    <origin xyz="-1.284 -0.245 0.665" rpy="-1.552155143 -0.014505592 -2.630802879" />
   </joint>
   <joint name="camera_rear_left" type="fixed">
-    <parent link="vehicle"/>
-    <child link="camera_rear_left"/>
-    <axis xyz="1. 0. 0."/>
-    <origin xyz="-1.607 0.12 0.74" rpy="-1.557020545 -0.002095502 0.51513268"/>
+    <parent link="vehicle" />
+    <child link="camera_rear_left" />
+    <axis xyz="1. 0. 0." />
+    <origin xyz="-1.607 0.12 0.74" rpy="-1.557020545 -0.002095502 0.51513268" />
   </joint>
   <joint name="camera_rear_right" type="fixed">
-    <parent link="vehicle"/>
-    <child link="camera_rear_right"/>
-    <axis xyz="1. 0. 0."/>
-    <origin xyz="-1.607 -0.12 0.74" rpy="-1.633882122 0.008570207 2.663618062"/>
+    <parent link="vehicle" />
+    <child link="camera_rear_right" />
+    <axis xyz="1. 0. 0." />
+    <origin xyz="-1.607 -0.12 0.74" rpy="-1.633882122 0.008570207 2.663618062" />
   </joint>
   <joint name="camera_back" type="fixed">
-    <parent link="vehicle"/>
-    <child link="camera_back"/>
-    <axis xyz="1. 0. 0."/>
-    <origin xyz="-4.035 0.0 0.39" rpy="-1.636306004 -0.0087242 1.556903652"/>
+    <parent link="vehicle" />
+    <child link="camera_back" />
+    <axis xyz="1. 0. 0." />
+    <origin xyz="-4.035 0.0 0.39" rpy="-1.636306004 -0.0087242 1.556903652" />
   </joint>
 </robot>

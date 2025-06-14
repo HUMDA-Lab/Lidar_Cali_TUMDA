@@ -8,10 +8,11 @@
     read_tf_from_table: true
 
     # table of lidar name (frame_id in ROS), xyz translation [m], rpy rotation [deg/rad]
-    ouster: [4.446, 0.02, 1.32, -0.028, 0.038, -0.014]
-    front: [2.308, 0.0, 0.70375, -0.0, -1.5707963267948966, -3.14159]
-    right: [1.70, -0.19, 0.77475, 0.6, -1.545, 0.4471953]
-    left: [1.64, 0.19, 0.77475, -1.3, -1.54, 0.256]
+    ouster: [4.446, 0.02, 1.347, -0.018569, 0.01447, -0.014]
+    front: [2.319, 0.00268, 0.68636, -0.37546573, -1.5461567, -2.7650]
+    left: [1.76349, 0.12679, 0.7449607,-1.7899759, -1.5592, 0.7437]
+    right: [1.7286966, -0.11475, 0.76980, 2.916668, -1.564541, -1.86865887]
+    
 
     # egyszer mar mukodott setup:
     # OUSTER FRAME:
@@ -26,7 +27,8 @@
     target_frame_id: ouster
     base_frame_id: vehicle
     calibrate_to_base: true
-    calibrate_target: true
+    calibrate_target: false
+    calibrate_roll_pitch_after_to_base_transform: true
 
     # path for point clouds in pcd format. Structure: /pcd_directory/<lidar_name>.pcd
     pcd_directory: /../data/LC03/

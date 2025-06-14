@@ -88,6 +88,39 @@ def modify_urdf_joint_origin(file_path: str, joint_name: str, tf_matrix: Transfo
                 raise Exception("joint has no origin to be modified")
     tree.write(file_path, xml_declaration=True)
 
+def read_transformation_from_urdf(file_path: str, joint_name: str):
+    """
+    Reads translation and rotation from a given joint in a URDF file.
+
+    Args:
+        File_path: The path to the URDF file.
+        joint_name: The name of the joint to read form.
+
+    Returns:
+        transformation, rotation of the joint.
+    """
+    # Parse the URDF file
+    parser = ET.XMLParser(target=ET.TreeBuilder(insert_comments=True))
+    tree = ET.parse(file_path, parser=parser)
+    root = tree.getroot()
+
+    # Find the joint with the given name
+    for joint in root.iter("joint"):
+        if "name" in joint.attrib and joint.attrib["name"] == joint_name:
+            origin = joint.find("origin")
+            if origin is not None:
+                translation_str = origin.attrib["xyz"]
+                rotation_str = origin.attrib["rpy"]
+                
+                translation_values = [float(x) for x in translation_str.split()]
+                rotation_values = [float(x) for x in rotation_str.split()]
+                
+                return translation_values, rotation_values
+            else:
+                raise Exception("joint has no origin to be modified")
+            
+    raise Exception("URDF file has no joint that was requested")
+            
 class Calibration:
     """
     Handles initial and GICP calibration between source and target lidars.

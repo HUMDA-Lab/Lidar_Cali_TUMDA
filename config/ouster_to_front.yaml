@@ -1,0 +1,32 @@
+/**:
+  ros__parameters:
+    visualize: true
+    use_fitness_based_calibration: false
+    # Topics for all lidars
+    lidar_topics: [lidar_front, os_lidar]
+    table_degrees: false
+    read_tf_from_table: false
+    read_tf_from_urdf: true
+    write_tf_to_urdf: true
+    urdf_path: /home/martin_nadas/ros2_cali_ws/Lidar_Cali_TUMDA/results/lidar_cali.urdf
+
+    # table of lidar name (frame_id in ROS), xyz translation [m], rpy rotation [deg/rad]
+    #ouster: [4.446, 0.02, 1.347, -0.018569, 0.01447, -0.014]
+    #front: [2.319, 0.0, 0.68636, -0.37546573, -1.5461567, -2.7650]
+    #left: [1.76349, 0.12679, 0.7449607,-1.7899759, -1.5592, 0.7437]
+    #right: [1.7286966, -0.11475, 0.76980, 2.916668, -1.564541, -1.86865887]
+
+    target_frame_id: lidar_front
+    base_frame_id: vehicle
+    calibrate_to_base: true
+    calibrate_target: true
+
+    # path for point clouds in pcd format. Structure: /pcd_directory/<lidar_name>.pcd
+    pcd_directory: /../data/lidar_calibration/
+
+    # logging output
+    results_file: ouster_to_front_results.txt
+    remove_ground_flag: false
+
+    # calibration results are stored here (path relative to the dir with multi_lidar_calibrator.py)
+    output_dir: /../output/

@@ -84,7 +84,10 @@ class MultiLidarCalibrator(Node):
         self.num_iterations = self.declare_parameter("num_iterations", 5000).value
         self.r_runs = self.declare_parameter("r_runs", 5).value
         self.urdf_path = self.declare_parameter("urdf_path", "").value
+        self.write_tf_to_urdf = self.declare_parameter("write_tf_to_urdf", False).value
+        self.read_tf_from_urdf = self.declare_parameter("read_tf_from_urdf", False).value
         self.results_file = self.declare_parameter("results_file", "results.txt").value
+        self.calibrate_roll_pitch_after_to_base_transform = self.declare_parameter("calibrate_roll_pitch_after_to_base_transform", False).value
         self.lidar_data = {}
         self.lidar_dict = {}
         self.subscribers = []
@@ -103,7 +106,7 @@ class MultiLidarCalibrator(Node):
         self.declared_lidars_flag = False
 
         # read all the data from files (without ROS)
-        if self.read_pcds_from_file and self.read_tf_from_table:
+        if self.read_pcds_from_file and (self.read_tf_from_table or self.read_tf_from_urdf):
             # get LiDAR names as subdirectory names
             lidar_list = [
                 os.path.splitext(os.path.basename(path))[0]
@@ -113,19 +116,42 @@ class MultiLidarCalibrator(Node):
             for lidar in lidar_list:
                 self.declare_parameter(lidar, [0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
                 pcd_paths[lidar] = glob.glob(self.pcd_in_dir + lidar + "*")
-            self.lidar_dict = dict(
-                zip(
-                    lidar_list,
-                    [
-                        Lidar(
-                            lidar,
-                            Translation(*self.get_parameter(lidar).value[0:3]),
-                            Rotation(*self.get_parameter(lidar).value[3:], self.table_degrees),
-                        )
-                        for lidar in lidar_list
-                    ],
+            
+            if(self.read_tf_from_table):
+                self.get_logger().info("Reading initial transformations from parameter table")
+                self.lidar_dict = dict(
+                    zip(
+                        lidar_list,
+                        [
+                            Lidar(
+                                lidar,
+                                Translation(*self.get_parameter(lidar).value[0:3]),
+                                Rotation(*self.get_parameter(lidar).value[3:], self.table_degrees),
+                            )
+                            for lidar in lidar_list
+                        ],
+                    )
                 )
-            )
+            elif(self.read_tf_from_urdf):
+                self.get_logger().info("Reading initial transformations from URDF")
+
+                if self.urdf_path == "":
+                    self.get_logger().error("urdf_path is not set, cannot read transformations from URDF")
+                    exit(1)
+
+                self.lidar_dict = dict(
+                    zip(
+                        lidar_list,
+                        [
+                            Lidar(
+                                lidar,
+                                Translation(*read_transformation_from_urdf(self.urdf_path, lidar)[0]),
+                                Rotation(*read_transformation_from_urdf(self.urdf_path, lidar)[1]),
+                            )
+                            for lidar in lidar_list
+                        ],
+                    )
+                )
             for lidar in lidar_list:
                 pcd = o3d.io.read_point_cloud(pcd_paths[lidar][0])
                 for i in range(1, self.frame_count):
@@ -133,8 +159,8 @@ class MultiLidarCalibrator(Node):
                 self.lidar_dict[lidar].load_pcd(pcd)
             self.process_data()
             exit(0)
-        elif self.read_pcds_from_file and not self.read_tf_from_table:
-            self.get_logger().error("read_tf_from_table is set to False")
+        elif self.read_pcds_from_file and not (self.read_tf_from_table or self.read_tf_from_urdf):
+            self.get_logger().error("read_tf_from_table and read_tf_from_urdf is set to False")
             exit(1)
         else:
             self.get_logger().info("waiting for point cloud messages...")
@@ -168,6 +194,27 @@ class MultiLidarCalibrator(Node):
                     ],
                 )
             )
+        elif(self.read_tf_from_urdf):
+                self.get_logger().info("Reading initial transformations from URDF")
+
+                if self.urdf_path == "":
+                    self.get_logger().error("urdf_path is not set, cannot read transformations from URDF")
+                    exit(1)
+
+                self.lidar_dict = dict(
+                    zip(
+                        self.lidar_data.keys(),
+                        [
+                            Lidar(
+                                lidar,
+                                Translation(*read_transformation_from_urdf(self.urdf_path, lidar)[0]),
+                                Rotation(*read_transformation_from_urdf(self.urdf_path, lidar)[1]),
+                            )
+                            for lidar in self.lidar_data.keys()
+                        ],
+                    )
+                )
+
         else:
             self.lidar_dict = dict(
                 zip(
@@ -230,10 +277,13 @@ class MultiLidarCalibrator(Node):
             # Log the calibration information
             self.log_calibration_info(calibration)
             # Modify the URDF file if a path is provided
-            if self.urdf_path != "":
+            if self.write_tf_to_urdf:
+                if self.urdf_path == "":
+                    self.get_logger().error("urdf path was not provided, but needed for writeout")
+                    exit(1)
                 modify_urdf_joint_origin(
                     self.urdf_path,
-                    source_lidar.name + "_joint",
+                    source_lidar.name,
                     calibration.calibrated_transformation,
                 )
             calibrated_lidars.append(source_lidar)
@@ -270,10 +320,13 @@ class MultiLidarCalibrator(Node):
                         file.write("Calibration NOT SUCCESSFUL!\n")
                 calibration.transform_pointcloud()
                 self.log_calibration_info(calibration)
-                if self.urdf_path != "":
+                if self.write_tf_to_urdf:
+                    if self.urdf_path == "":
+                        self.get_logger().info("urdf_path was not provided")
+                        exit(1)
                     modify_urdf_joint_origin(
                         self.urdf_path,
-                        source_lidar.name + "_joint",
+                        source_lidar.name,
                         calibration.calibrated_transformation,
                     )
 
@@ -360,10 +413,13 @@ class MultiLidarCalibrator(Node):
             if calibration.target == target_lidar:
                 not_calibrated.remove(calibration.source)
                 self.log_calibration_info(calibration)
-                if self.urdf_path != "":
+                if self.write_tf_to_urdf:
+                    if self.urdf_path == "":
+                        self.get_logger().error("URDF path was not provided")
+                        exit(1)
                     modify_urdf_joint_origin(
                         self.urdf_path,
-                        calibration.source.name + "_joint",
+                        calibration.source.name,
                         calibration.calibrated_transformation,
                     )
 
@@ -398,24 +454,44 @@ class MultiLidarCalibrator(Node):
             self.get_logger().info("Visualizing the input transformations")
             visualize_calibration(list(self.lidar_dict.values()), visualize_original=False, visualize_input_transformation=True, visualize_transformed=False)
         target_lidar = self.lidar_dict[self.target_lidar]
-        if self.calibrate_to_base and self.calibrate_target:
-            # Perform target to ground (base) calibration. This computes the z-distance between the ground and the target
-            # LiDAR and calibrates the pitch angle. It assumes that x, y, and yaw are precisely known
-            # as well as the transformation between the base and ground.
+
+        if self.calibrate_target:
             self.get_logger().info(f"Calibrating target lidar to the ground")
-            roll, pitch = self.lidar_dict[self.target_lidar].calibrate_pitch(
+
+            # create a copy of the targer lidar:
+            target_lidar_copy = Lidar("target_copy", target_lidar.translation, target_lidar.rotation)
+            target_lidar_copy.load_pcd(target_lidar.pcd)
+
+            # preform the initial input transformation on the copy
+            target_lidar_copy.pcd.transform(target_lidar_copy.tf_matrix.matrix)
+
+            # calculate the roll and pitch correction
+            roll, pitch = target_lidar_copy.calibrate_pitch(
                 self.distance_threshold,
                 self.ransac_n,
                 self.num_iterations,
                 self.r_voxel_size,
                 self.r_runs,
             )
+            roll_pitch_correction_matrix = TransformationMatrix(Translation(0,0,0), Rotation(roll, pitch, 0))
 
-            # Update the target lidar's rotation
-            target_lidar.rotation.y = pitch
-            target_lidar.rotation.x = roll
-            rotation = target_lidar.rotation
+            # Caculate new transformation
+            new_matrix = roll_pitch_correction_matrix.matrix @ target_lidar.tf_matrix.matrix
+            new_trafo_matrix = TransformationMatrix.from_matrix(new_matrix)
+            
+            self.get_logger().info(
+                f"Calibrated target lidar {self.target_lidar} to the ground with RANSAC algorithm\n"
+                f"Original roll: {target_lidar.rotation.x}, pitch: {target_lidar.rotation.y}\n"
+                f"Calibrated roll: {new_trafo_matrix.rotation.x}, pitch: {new_trafo_matrix.rotation.y}\n"
+                f"Difference in roll: {roll}, difference in pitch: {pitch}"
+            )
 
+            # update target lidar
+            target_lidar.tf_matrix = new_trafo_matrix
+            target_lidar.translation = target_lidar.tf_matrix.translation
+            target_lidar.rotation = target_lidar.tf_matrix.rotation
+
+            # calibrate z distance from ground
             # Create a horizontal point cloud to use as a ground reference
             horizontal = Lidar(self.base_frame_id, Translation(0, 0, 0), Rotation(0, 0, 0))
             dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -433,11 +509,12 @@ class MultiLidarCalibrator(Node):
                 self.crop_cloud,
                 self.get_logger(),
             )
-            translation = target_lidar.translation
             calibration.compute_gicp_transformation(self.voxel_size, remove_ground_plane=False)
 
             # Update the target lidar's translation
-            if self.read_tf_from_table:
+            translation = target_lidar.translation
+            rotation = target_lidar.rotation
+            if self.read_tf_from_table or self.read_tf_from_urdf:
                 translation.z = (
                     calibration.calibrated_transformation.translation.z - self.base_to_ground_z
                 )
@@ -450,25 +527,37 @@ class MultiLidarCalibrator(Node):
             # Update the target lidar's transformation and point cloud
             calibration.calibrated_transformation = TransformationMatrix(translation, rotation)
             self.log_calibration_info(calibration)
-            if self.urdf_path != "":
+            if self.write_tf_to_urdf:
+                if self.urdf_path == "":
+                    self.get_logger().error("URDF path was not provided")
+                    exit(1)
                 modify_urdf_joint_origin(
                     self.urdf_path,
-                    self.target_lidar + "_joint",
+                    self.target_lidar,
                     calibration.calibrated_transformation,
                 )
             calibration.transform_pointcloud()
 
-            # Reset the target lidar's transformation and update its point cloud
-            self.lidar_dict.pop(self.target_lidar)
-            target_lidar = Lidar(self.base_frame_id, Translation(0, 0, 0), Rotation(0, 0, 0))
-            target_lidar.load_pcd(calibration.source.pcd_transformed)
-            self.lidar_dict[target_lidar.name] = target_lidar
-
+            if self.calibrate_to_base:
+                # Reset the target lidar's transformation and update its point cloud
+                self.lidar_dict.pop(self.target_lidar)
+                target_lidar = Lidar(self.base_frame_id, Translation(0, 0, 0), Rotation(0, 0, 0))
+                target_lidar.load_pcd(calibration.source.pcd_transformed)
+                self.lidar_dict[target_lidar.name] = target_lidar
+        
         elif self.calibrate_to_base:
             # If the target to base transformation is already known, just transform the point cloud
             target_lidar.pcd.transform(target_lidar.tf_matrix.matrix)
             target_lidar.translation = Translation(0, 0, 0)
             target_lidar.rotation = Rotation(0, 0, 0)
+            target_lidar.tf_matrix = TransformationMatrix(
+                target_lidar.translation, target_lidar.rotation
+            )
+            # And rename the target lidar to base frame
+            target_lidar.name = self.base_frame_id    
+
+        if self.visualize:
+            visualize_calibration(list(self.lidar_dict.values()), visualize_original=False, visualize_input_transformation=True, visualize_transformed=False)
 
         # Perform the main LiDAR-to-LiDAR calibration
         if self.use_fitness_based_calibration:
@@ -477,7 +566,8 @@ class MultiLidarCalibrator(Node):
             self.standard_calibration(target_lidar)
 
         if self.visualize:
-            visualize_calibration(list(self.lidar_dict.values()), visualize_original=False, visualize_input_transformation=True, visualize_transformed=False)
+            visualize_calibration(list(self.lidar_dict.values()), visualize_original=False, visualize_input_transformation=False, visualize_transformed=True)
+        
         # Stitch point clouds
         stitched_pcd = o3d.geometry.PointCloud()
         for lidar in self.lidar_dict.values():
@@ -501,7 +591,7 @@ class MultiLidarCalibrator(Node):
 
     def pointcloud_callback(self, msg: PointCloud2):
         # Wait for the TFMessage before processing the point cloud if table is not used
-        if self.tf_msg is None and not self.read_tf_from_table:
+        if self.tf_msg is None and not (self.read_tf_from_table or self.read_tf_from_urdf):
             self.get_logger().info("Waiting for tf...")
             return
 
@@ -517,7 +607,7 @@ class MultiLidarCalibrator(Node):
         if [len(self.lidar_data[i]) == self.frame_count for i in self.lidar_data.keys()] == [
             True
         ] * len(self.topic_names):
-            if self.read_tf_from_table and not self.declared_lidars_flag:
+            if (self.read_tf_from_table or self.read_tf_from_urdf) and not self.declared_lidars_flag:
                 for lidar in self.lidar_data.keys():
                     self.declare_parameter(lidar)
                 self.declared_lidars_flag = True  # Don't repeatedly declare the same parameters
