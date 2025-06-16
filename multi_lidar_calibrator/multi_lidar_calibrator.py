@@ -548,6 +548,8 @@ class MultiLidarCalibrator(Node):
         elif self.calibrate_to_base:
             # If the target to base transformation is already known, just transform the point cloud
             target_lidar.pcd.transform(target_lidar.tf_matrix.matrix)
+            # Update pcd_transformed to reflect the change in target_lidar.pcd
+            target_lidar.pcd_transformed = o3d.geometry.PointCloud(target_lidar.pcd)
             target_lidar.translation = Translation(0, 0, 0)
             target_lidar.rotation = Rotation(0, 0, 0)
             target_lidar.tf_matrix = TransformationMatrix(
