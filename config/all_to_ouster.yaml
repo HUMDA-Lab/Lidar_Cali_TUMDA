@@ -3,7 +3,7 @@
     visualize: true
     use_fitness_based_calibration: false
     # Topics for all lidars
-    lidar_topics: [lidar_front, os_lidar]
+    lidar_topics: [os_lidar, lidar_front, lidar_left, lidar_right]
     table_degrees: false
     read_tf_from_table: false
     read_tf_from_urdf: true
@@ -16,7 +16,7 @@
     #left: [1.76349, 0.12679, 0.7449607,-1.7899759, -1.5592, 0.7437]
     #right: [1.7286966, -0.11475, 0.76980, 2.916668, -1.564541, -1.86865887]
 
-    target_frame_id: front_lidar
+    target_frame_id: os_lidar
     base_frame_id: vehicle
     calibrate_to_base: true
     calibrate_target: true

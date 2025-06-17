@@ -7,9 +7,9 @@
       <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
     </inertial>
     <visual>
-      <origin xyz="0 0.0 0.0" rpy="-1.57079632679 0.0 0.0" />
+      <origin xyz="1.75 0.0 0.0" rpy="0.0 0.0 1.57079632679" />
       <geometry>
-          <mesh filename="/home/martin_nadas/tooling/foxglove/Dallara_SF23_A2RL_Car_Subdivision1.stl" scale="1.0 1.0 1.0" />
+          <mesh filename="/home/martin_nadas/tooling/foxglove/a2rl.glb" scale="1.0 1.0 1.0" />
       </geometry>
     </visual>
     <!-- Bounding box for car size -->
@@ -19,6 +19,56 @@
         <box size="5.2359 1.9207 1.2" />
       </geometry>
     </collision>
+    <!-- Centerline shadow -->
+    <visual>
+      <origin xyz="-15 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="30 0.1 1.0" />
+      </geometry>
+      <material name="white">
+        <color rgba="1 1 1 0.4" />
+      </material>
+    </visual>
+    <!-- Right lidar rear wing shadow -->
+    <visual>
+      <origin xyz="-13.06 -2.67 0" rpy="0 0 0.17" />
+      <geometry>
+        <box size="30 0.05 1.0" />
+      </geometry>
+      <material name="red">
+        <color rgba="1 0 0 0.4" />
+      </material>
+    </visual>
+    <!-- Left lidar rear wing shadow -->
+    <visual>
+      <origin xyz="-13.06 2.67 0" rpy="0 0 -0.17" />
+      <geometry>
+        <box size="30 0.05 1.0" />
+      </geometry>
+      <material name="red">
+        <color rgba="1 0 0 0.4" />
+      </material>
+    </visual>
+    <!-- Front tire shadow -->
+    <visual>
+      <origin xyz="10 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.05 20 1.0" />
+      </geometry>
+      <material name="white">
+        <color rgba="1 1 1 0.4" />
+      </material>
+    </visual>
+    <!-- Rear tire shadow -->
+    <visual>
+      <origin xyz="-6 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.05 20 1.0" />
+      </geometry>
+      <material name="white">
+        <color rgba="1 1 1 0.4" />
+      </material>
+    </visual>
   </link>
   <link name="gps_front">
     <inertial>
@@ -205,25 +255,25 @@
     <parent link="vehicle" />
     <child link="os_lidar" />
     <axis xyz="1. 0. 0." />
-    <origin xyz="4.527005984494918 0.0381238776416746 1.2774865063846736" rpy="-0.019665734979499142 0.042505344479095486 -0.01717760535525066" />
+    <origin xyz="4.406907516948252 0.03574011377571041 1.3476021580750932" rpy="-0.018913256191144655 0.014561210282393544 -1.814395860259373e-06" />
   </joint>
   <joint name="lidar_front" type="fixed">
     <parent link="vehicle" />
     <child link="lidar_front" />
     <axis xyz="1. 0. 0." />
-    <origin xyz="2.336705241335275 0.0007543215968829292 0.6777519765090311" rpy="-2.0885913100586677 -1.5616717557497841 -1.0520486075985627" />
+    <origin xyz="2.282044425255705 -0.010037285272872832 0.688588347963234" rpy="-0.3753947880849591 -1.5464300686008563 -2.7512553820799317" />
   </joint>
   <joint name="lidar_left" type="fixed">
     <parent link="vehicle" />
     <child link="lidar_left" />
     <axis xyz="1. 0. 0." />
-    <origin xyz="1.8245261897761837 0.15400269083897508 0.7501353479382715" rpy="-1.2731980578937063 -1.5333732668329811 0.2237643543565873" />
+    <origin xyz="1.7187824378187708 0.10566213121500106 0.7449181083792673" rpy="-1.8039286328831663 -1.5590780850698356 0.7715362457914557" />
   </joint>
   <joint name="lidar_right" type="fixed">
     <parent link="vehicle" />
     <child link="lidar_right" />
     <axis xyz="1. 0. 0." />
-    <origin xyz="1.8005809754138709 -0.09108359263480835 0.7789440650815105" rpy="1.2679204454671196 -1.5439791881790497 -0.22372712722718577" />
+    <origin xyz="1.6978671550274618 -0.13951367918263644 0.7729420430023692" rpy="2.897749946089405 -1.5643347082895986 -1.836301214659613" />
   </joint>
   <joint name="camera_front_left" type="fixed">
     <parent link="vehicle" />
